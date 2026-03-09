@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # Umbraco.V17.NextJs
 
 > A headless CMS project using **Umbraco 17** with **Next.js** for frontend rendering. Designed as a starter template for **.NET 10 + Umbraco 17 headless development**.
