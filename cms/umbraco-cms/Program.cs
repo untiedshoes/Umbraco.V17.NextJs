@@ -7,10 +7,24 @@ builder.CreateUmbracoBuilder()
     .AddDeliveryApi()
     .Build();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost3000",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 WebApplication app = builder.Build();
 
 await app.BootUmbracoAsync();
 
+//use CORS
+app.UseCors("AllowLocalhost3000");
 
 app.UseUmbraco()
     .WithMiddleware(u =>

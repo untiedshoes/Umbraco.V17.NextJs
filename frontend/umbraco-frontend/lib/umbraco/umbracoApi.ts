@@ -42,3 +42,47 @@ export async function fetchHomepage() {
     // Return first item as homepage
     return data.items[0];
 }
+
+// Fetch top-level navigation items (root children)
+export async function fetchNavigationOld() {
+    const res = await fetch(`${UM_BRACO_URL}/umbraco/delivery/api/v2/content`);
+    if (!res.ok) {
+        throw new Error(`Failed to fetch navigation items: ${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    //only show pages where hideFromTopNavigation is false
+    return data.items?.filter((item: any) => item.properties?.hideFromTopNavigation === false) || [];
+}
+
+// lib/umbraco/umbracoApi.ts
+export async function fetchNavigation() {
+    const res = await fetch(`${UM_BRACO_URL}/umbraco/delivery/api/v2/content`);
+    if (!res.ok) throw new Error(`Failed to fetch navigation items: ${res.status} ${res.statusText}`);
+
+    const data = await res.json();
+
+    // Homepage (first allowedAtRoot item)
+    const homepage = data.items?.find((item: any) => item.allowedAtRoot) || data.items?.[0];
+
+    if (!homepage) throw new Error("No homepage found");
+
+    // Other items: not homepage, not hidden
+    const otherItems = data.items
+        .filter((item: any) => item.id !== homepage.id && item.properties?.hideFromTopNavigation !== true)
+        .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            // Use route.path if it exists, otherwise fallback to slug, otherwise item ID
+            url: item.route?.path || item.slug || `item/${item.id}`,
+        }));
+
+    return [
+        {
+            id: homepage.id,
+            name: "Home",
+            url: "/",
+        },
+        ...otherItems,
+    ];
+}
