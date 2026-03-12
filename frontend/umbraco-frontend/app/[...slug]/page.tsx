@@ -1,37 +1,54 @@
-// app/[...slug]/page.tsx
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { BlockRenderer } from "@/components/blocks/BlockRenderer";
-import { fetchHomepage, fetchContentByPath } from "@/lib/umbraco/umbracoApi";
+import { PageRenderer } from "@/components/PageRenderer";
+import { getPage } from "@/lib/umbraco";
+import { getDictionaryItems } from "@/helpers/dictionary";
+import { getMeta } from "@/helpers/metaHelper";
+import type { ContentContentResponseModel } from "@/lib/api/model";
 
-interface PageProps {
-    params: { slug?: string[] } | Promise<{ slug?: string[] }>;
+interface PageParams {
+    page: string[];
 }
 
-export default async function Page({ params }: PageProps) {
-    const resolvedParams = await params;
-    const slugPath = resolvedParams.slug?.join("/") || "";
+export async function generateStaticParams() {
+    // Example: fetch all pages if needed for dynamic routing
+    // You could use getContentItems20() here if you want
+    return [];
+}
 
-    let page;
+export async function generateMetadata({ params }: { params: PageParams }) {
+    const path = `/${params.page.join("/")}/`;
+    const metaContent = await getPage<ContentContentResponseModel>(path);
 
-    try {
-        if (!slugPath || slugPath === "home") {
-            // Fetch homepage dynamically from root
-            page = await fetchHomepage();
-        } else {
-            // Fetch page by path
-            page = await fetchContentByPath(slugPath);
-        }
-    } catch (err) {
-        console.error("Failed to fetch page:", err);
-        return <div>Page not found</div>;
-    }
+    if (!metaContent) return notFound();
+
+    return getMeta(metaContent);
+}
+
+export default async function Page({ params }: { params: PageParams }) {
+    const path = `/${params.page.join("/")}/`;
+
+    const dictionaryItems = await getDictionaryItems();
+    const pageContent = await getPage<ContentContentResponseModel>(path);
+
+    if (!pageContent) return <div>Page not found</div>;
 
     return (
-        <main>
-            <h1>{page.name}</h1>
-            {page.properties?.contentRows?.items && (
-                <BlockRenderer blocks={page.properties.contentRows.items} />
-            )}
-        </main>
+        <>
+            {pageContent.name && <h1>{pageContent.name}</h1>}
+
+            <article>
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-8 col-md-10 mx-auto">
+                            {pageContent?.properties?.contentRows?.items?.map((item, index) => (
+                                <PageRenderer key={index} content={item} dictionary={dictionaryItems} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </>
     );
 }

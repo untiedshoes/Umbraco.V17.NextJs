@@ -1,14 +1,17 @@
-// app/layout.tsx
-import { Header } from "@/components/header/Header";
-import { Footer } from "@/components/footer/Footer";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Header />
+        <header>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
         <main>{children}</main>
-        <Footer />
+        <footer>
+          <p>&copy; {new Date().getFullYear()} My Umbraco Site</p>
+        </footer>
       </body>
     </html>
   );

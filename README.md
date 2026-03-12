@@ -9,10 +9,11 @@
 **Umbraco.V17.NextJs:** This repository contains a **starter project** demonstrating a **modern Umbraco 17 headless setup** integrated with a **Next.js frontend**. It includes best practices for:
 
 - Content API integration via **Umbraco Delivery API**
+- Typed models using Umbraco Delivery API Extensions for TypeScript
 - Next.js rendering with dynamic blocks
 - ASP.NET Core backend configuration
 - Development workflow using **.NET 10 SDK** and **Node.js**
-- Headless CMS architecture
+- Headless CMS architecture with structured API responses
 
 The project is intended as a foundation for building **dynamic, maintainable websites** with Umbraco as a backend CMS.
 
@@ -25,6 +26,7 @@ This repository serves as a **practical template** for developers who want to:
 - Start a **headless Umbraco 17 project**
 - Connect Umbraco content via **REST APIs** to a **Next.js frontend**
 - Use **.NET 10 SDK** with modern C# features
+- Use typed API models with automatic Swagger-based generation
 - Experiment with **headless CMS workflows** in a structured project
 
 ---
@@ -126,7 +128,62 @@ Complete the Umbraco installer:
 
 ---
 
-## 2. Run the Next.js Frontend
+## 2. Install & Configure Umbraco Delivery API Extensions
+Now includes the Umbraco.Community.DeliveryApiExtensions package:
+```bash
+dotnet add package Umbraco.Community.DeliveryApiExtensions
+```
+This provides:
+- Typed API responses from Delivery API
+- Automatic Swagger/OpenAPI generation
+- Strongly-typed TypeScript models for frontend
+- Improved developer experience with autocomplete and type safety
+
+## Typed API Example: getNavigation()
+The getNavigation() function fetches navigation items from Umbraco and automatically uses **typed models** (VisibilityControlsContentResponseModel) provided by the **Delivery API Extensions**.
+```
+import { getContent20 } from "@/lib/api/content/content";
+import { PagedIApiContentResponseModel, VisibilityControlsContentResponseModel } from "@/api/model";
+
+/**
+ * Fetch top-level navigation items from Umbraco Delivery API
+ */
+export async function getNavigation(): Promise<VisibilityControlsContentResponseModel[]> {
+  const response = await getContent20(
+    {
+      fetch: "children:/",        // Fetch top-level pages
+      sort: ["sortOrder:asc"],    // Sort by order
+    },
+    {
+      next: {
+        tags: ["navigation"],     // Cache key for Next.js
+      },
+    }
+  );
+
+  if (response.status === 200) {
+    // TypeScript knows the type of `data.items` thanks to PagedIApiContentResponseModel
+    const data: PagedIApiContentResponseModel = response.data as PagedIApiContentResponseModel;
+
+    // Filter out pages hidden from navigation
+    return data.items.filter(
+      (item: VisibilityControlsContentResponseModel) =>
+        item.properties?.hideFromTopNavigation === false
+    );
+  } else {
+    console.error("Error fetching navigation items:", response.status, response.data);
+    return [];
+  }
+}
+```
+**Key Points:**
+- data.items is **typed**, no more any errors in TypeScript.
+- VisibilityControlsContentResponseModel provides **autocomplete for properties** like hideFromTopNavigation.
+- Works seamlessly with **Next.js**, including caching and incremental static regeneration.
+
+---
+
+## 3. Run the Next.js Frontend
 Open a new terminal and navigate to the frontend:
 ```bash
 cd frontend/umbraco-frontend
@@ -139,7 +196,7 @@ npm install
 
 Create an environment file .env.local in frontend/umbraco-frontend:
 ```
-NEXT_PUBLIC_UMBRACO_URL=https://localhost:44300
+NEXT_PUBLIC_UMBRACO_URL=https://localhost:5101
 ```
 
 Start the development server:
@@ -152,11 +209,11 @@ Open the frontend:
 http://localhost:3000
 ```
 
-The Next.js app should now fetch and render content from the Umbraco CMS.
+The app now fetches content using typed API models generated from the Delivery API Extensions.
 
 ---
 
-## 3. Generate TypeScript Models (Optional but Recommended)
+## 4. Generate TypeScript Models (Optional but Recommended)
 
 Whenever you add or modify Document Types or Blocks in Umbraco, regenerate the frontend models:
 
@@ -177,7 +234,7 @@ Providing:
 
 ---
 
-## 4. Development Notes
+## 5. Development Notes
 ### Dynamic Pages
 
 The frontend uses a dynamic route:
