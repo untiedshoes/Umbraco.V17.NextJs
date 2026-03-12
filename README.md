@@ -141,13 +141,14 @@ This provides:
 
 ## Typed API Example: getNavigation()
 The getNavigation() function fetches navigation items from Umbraco and automatically uses **typed models** (VisibilityControlsContentResponseModel) provided by the **Delivery API Extensions**.
-```
+```ts
 import { getContent20 } from "@/lib/api/content/content";
 import { PagedIApiContentResponseModel, VisibilityControlsContentResponseModel } from "@/api/model";
 
 /**
  * Fetch top-level navigation items from Umbraco Delivery API
  */
+
 export async function getNavigation(): Promise<VisibilityControlsContentResponseModel[]> {
   const response = await getContent20(
     {
