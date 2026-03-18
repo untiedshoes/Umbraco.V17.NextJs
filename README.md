@@ -152,7 +152,7 @@ dotnet add package Umbraco.Community.DeliveryApiExtensions
 ```
 
 Enable Delivery API:
-```json
+```js
 {
   "Umbraco": {
     "DeliveryApi": {
@@ -268,7 +268,7 @@ export async function getNavigation(): Promise<VisibilityControlsContentResponse
 ---
 
 ## 3. Block Rendering
-Open a new terminal and navigate to the frontend:
+
 ```
 Umbraco Blocks
      ↓
@@ -285,7 +285,7 @@ React Components
 
 ## Why Orval?
 
-**Orval** transforms your Swagger/OpenAPI schema into a fully typed API client.
+**Orval** transforms the Swagger/OpenAPI schema into a fully typed API client.
 **Without Orval**
 - Manual fetch calls
 - any types everywhere
