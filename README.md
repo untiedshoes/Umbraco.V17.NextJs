@@ -1,33 +1,33 @@
 # Umbraco.V17.NextJs
 
-> A headless CMS project using **Umbraco 17** with **Next.js** for frontend rendering. Designed as a starter template for **.NET 10 + Umbraco 17 headless development**.
+> A modern headless CMS starter using **Umbraco 17** (.NET 10) and **Next.js**, featuring fully typed APIs via **Swagger** + **Orval**.
 
 ---
 
 ## Overview
 
-**Umbraco.V17.NextJs:** This repository contains a **starter project** demonstrating a **modern Umbraco 17 headless setup** integrated with a **Next.js frontend**. It includes best practices for:
+This project demonstrates a **production-ready headless architecture** using:
 
-- Content API integration via **Umbraco Delivery API**
-- Typed models using Umbraco Delivery API Extensions for TypeScript
-- Next.js rendering with dynamic blocks
-- ASP.NET Core backend configuration
-- Development workflow using **.NET 10 SDK** and **Node.js**
-- Headless CMS architecture with structured API responses
+- **Umbraco 17** as a CMS backend
+- **Umbraco Delivery API** for content access
+- **Delivery API Extensions** for typed responses
+- **Swagger / OpenAPI** for schema generation
+- **Orval** for TypeScript API client generation
+- **Next.js (App Router)** for frontend rendering
 
-The project is intended as a foundation for building **dynamic, maintainable websites** with Umbraco as a backend CMS.
+It provides a strong foundation for building **scalable, type-safe, and maintainable headless applications**.
 
 ---
 
 ## Purpose
 
-This repository serves as a **practical template** for developers who want to:
+This repository is designed to help developers:
 
-- Start a **headless Umbraco 17 project**
-- Connect Umbraco content via **REST APIs** to a **Next.js frontend**
-- Use **.NET 10 SDK** with modern C# features
-- Use typed API models with automatic Swagger-based generation
-- Experiment with **headless CMS workflows** in a structured project
+- Build a **headless Umbraco 17** project
+- Use **typed APIs end-to-end**
+- Integrate Umbraco with **Next.js**
+- Leverage **OpenAPI-driven development**
+- Follow **real-world architecture patterns**
 
 ---
 
@@ -37,56 +37,80 @@ This repository serves as a **practical template** for developers who want to:
 Umbraco.V17.NextJs/
 │
 ├─ cms/
-│   └─ umbraco-cms/               # Umbraco 17 CMS (starter kit)
-│       ├─ wwwroot/               # Static assets for the CMS
-│       │   ├─ css/               # Starter CSS (optional copy)
-│       │   └─ js/                # Starter JS (optional copy)
+│   └─ umbraco-cms/                        # Umbraco 17 CMS (backend)
+│       ├─ Program.cs                      # Application entry point
+│       ├─ appsettings.json                # Core configuration (Delivery API, etc.)
+│       ├─ appsettings.Development.json
+│       ├─ appsettings-schema*.json
+│       ├─ umbraco-cms.csproj
 │       │
-│       ├─ Views/                 # Razor views (reference)
-│       │   └─ Partials/          # Partial view templates
+│       ├─ umbraco/
+│       │   ├─ Data/                       # SQLite DB, indexes, temp files
+│       │   └─ Logs/                       # Umbraco logs
 │       │
-│       ├─ appsettings.json       # CMS settings (Delivery API config)
-│       └─ Program.cs             # .NET startup
+│       ├─ Views/                          # Razor views (reference only)
+│       │   ├─ Partials/
+│       │   ├─ Components/
+│       │   └─ *.cshtml
+│       │
+│       └─ wwwroot/                        # Static assets (media, css, js)
+│           ├─ css/
+│           ├─ assets/
+│           └─ media/
 │
 ├─ frontend/
-│   └─ umbraco-frontend/          # Next.js frontend app
-│       ├─ app/
-│       │   ├─ layout.tsx         # Global layout (Header, Footer)
-│       │   ├─ page.tsx           # Home page
-│       │   └─ [...slug]/page.tsx # Dynamic pages from Delivery API
+│   └─ umbraco-frontend/                   # Next.js frontend
+│       ├─ app/                            # App Router (Next.js)
+│       │   ├─ [...slug]/page.tsx          # Dynamic routing (Umbraco pages)
+│       │   ├─ layout.tsx                  # Global layout
+│       │   ├─ not-found.tsx
+│       │   └─ globals.css
 │       │
-│       ├─ components/
-│       │   ├─ layout/            # Common layout components
-│       │   │   ├─ Header.tsx
-│       │   │   └─ Footer.tsx
+│       ├─ src/
+│       │   ├─ components/                 # React components
+│       │   │   ├─ blocks/                 # Block List / Grid renderers
+│       │   │   └─ layout/                 # Header, Footer, Navigation
 │       │   │
-│       │   └─ blocks/            # Block components
-│       │       ├─ Hero.tsx
-│       │       ├─ RichText.tsx
-│       │       ├─ Image.tsx
-│       │       └─ ...other blocks
-│       │
-│       ├─ lib/
-│       │   ├─ umbracoApi.ts      # API client (Content Delivery API)
-│       │   ├─ blocksMapper.ts    # Map block type → React component
-│       │   └─ renderBlocks.tsx   # Render logic for blocks
-│       │
-│       ├─ types/
-│       │   └─ umbraco.d.ts       # Auto‑generated TypeScript models
+│       │   ├─ helpers/                    # Utility helpers
+│       │   │   ├─ dictionary.ts
+│       │   │   ├─ image.ts
+│       │   │   ├─ links.ts
+│       │   │   ├─ metaHelper.ts
+│       │   │   ├─ spacing.ts
+│       │   │   └─ youtube.ts
+│       │   │
+│       │   ├─ lib/
+│       │   │   ├─ api/                    # Orval-generated API client
+│       │   │   │   ├─ content/
+│       │   │   │   ├─ media/
+│       │   │   │   └─ model/              # Typed models (Delivery API)
+│       │   │   │
+│       │   │   ├─ api-clean/              # Clean starter kit API (optional)
+│       │   │   │   ├─ content/
+│       │   │   │   ├─ media/
+│       │   │   │   └─ model/
+│       │   │   │
+│       │   │   └─ umbraco/
+│       │   │       └─ index.ts            # Custom API wrappers (getArticles, etc.)
+│       │   │
+│       │   ├─ config/                     # Project config (if used)
+│       │   └─ custom-fetch.ts             # Custom fetch wrapper
 │       │
 │       ├─ styles/
-│       │   ├─ site.css           # Starter kit / custom CSS
-│       │   └─ tailwind.config.js # Tailwind config (if used)
+│       │   ├─ site.css
+│       │   └─ tailwind.config.js
 │       │
-│       └─ .env.local             # Local env vars (NEXT_PUBLIC_UMBRACO_URL)
+│       ├─ public/                         # Static assets
+│       ├─ orval.config.js                 # Orval config (OpenAPI → TS client)
+│       ├─ next.config.ts
+│       ├─ tsconfig.json
+│       ├─ package.json
+│       └─ README.md
 │
-│
-├─ Umbraco.V17.NextJs.sln         # .NET solution file
-├─ .gitignore                     # Files/folders to ignore in git
-└─ README.md                      # Project documentation
+├─ Umbraco.V17.NextJs.sln                  # .NET solution
+└─ README.md
 
 ```
-
 ---
 
 ## Getting Started
@@ -102,45 +126,109 @@ Prerequisites (Make sure the following tools are installed:)
 
 ## 1. Run the Umbraco 17 CMS
 
-Navigate to the CMS project:
 ```bash
 cd cms/umbraco-cms
-```
-
-Restore dependencies:
-```bash
 dotnet restore
-```
-
-Run the CMS:
-```bash
 dotnet run
 ```
 
-Open the site in your browser:
+Open:
+```bash
+https://localhost:5101
 ```
-https://localhost:44300
-```
-Complete the Umbraco installer:
-- Choose SQLite for local development
-- Install the Starter Kit
-- Ensure the Content Delivery API is enabled
+
+Complete setup:
+
+- Use SQLite
+- Install Starter Kit
+- Enable Delivery API
 
 ---
 
-## 2. Install & Configure Umbraco Delivery API Extensions
-Now includes the Umbraco.Community.DeliveryApiExtensions package:
+## 2. Install Delivery API Extensions
+
 ```bash
 dotnet add package Umbraco.Community.DeliveryApiExtensions
 ```
-This provides:
-- Typed API responses from Delivery API
-- Automatic Swagger/OpenAPI generation
-- Strongly-typed TypeScript models for frontend
-- Improved developer experience with autocomplete and type safety
 
-## Typed API Example: getNavigation()
-The getNavigation() function fetches navigation items from Umbraco and automatically uses **typed models** (VisibilityControlsContentResponseModel) provided by the **Delivery API Extensions**.
+Enable Delivery API:
+```json
+{
+  "Umbraco": {
+    "DeliveryApi": {
+      "Enabled": true
+    }
+  }
+}
+```
+---
+
+## 3. Run Frontend
+
+```bash
+cd frontend/umbraco-frontend
+npm install
+npm run dev
+```
+
+Create .env.local:
+```
+NEXT_PUBLIC_UMBRACO_URL=https://localhost:5101
+```
+---
+
+## Architecture
+```
+Umbraco CMS
+     ↓
+Delivery API
+     ↓
+Swagger / OpenAPI
+     ↓
+Orval (code generation)
+     ↓
+Typed API Client (TS)
+     ↓
+Custom API Layer (lib/umbraco)
+     ↓
+Next.js Frontend
+```
+---
+
+## Data Flow
+```
+Next.js page request
+        ↓
+Custom API (index.ts)
+        ↓
+Orval client (typed)
+        ↓
+Umbraco Delivery API
+        ↓
+Typed response models
+        ↓
+React components render UI
+```
+---
+
+## Typed API (Delivery API Extensions)
+
+Using:
+```
+Umbraco.Community.DeliveryApiExtensions
+```
+You get:
+- Strongly typed responses per Document Type
+- Swagger-generated schemas
+- Models like:
+  - ArticleContentResponseModel
+  - AuthorContentResponseModel
+  - AuthorContentResponseModel
+
+---
+
+## Example: Typed Navigation
+
 ```ts
 import { getContent20 } from "@/lib/api/content/content";
 import { PagedIApiContentResponseModel, VisibilityControlsContentResponseModel } from "@/api/model";
@@ -177,106 +265,55 @@ export async function getNavigation(): Promise<VisibilityControlsContentResponse
   }
 }
 ```
-**Key Points:**
-- data.items is **typed**, no more any errors in TypeScript.
-- VisibilityControlsContentResponseModel provides **autocomplete for properties** like hideFromTopNavigation.
-- Works seamlessly with **Next.js**, including caching and incremental static regeneration.
-
 ---
 
-## 3. Run the Next.js Frontend
+## 3. Block Rendering
 Open a new terminal and navigate to the frontend:
-```bash
-cd frontend/umbraco-frontend
 ```
-
-Install dependencies:
-```bash
-npm install
+Umbraco Blocks
+     ↓
+JSON (Delivery API)
+     ↓
+renderBlocks.tsx
+     ↓
+blocksMapper.ts
+     ↓
+React Components
 ```
-
-Create an environment file .env.local in frontend/umbraco-frontend:
-```
-NEXT_PUBLIC_UMBRACO_URL=https://localhost:5101
-```
-
-Start the development server:
-```bash
-npm run dev
-```
-
-Open the frontend:
-```
-http://localhost:3000
-```
-
-The app now fetches content using typed API models generated from the Delivery API Extensions.
 
 ---
 
-## 4. Generate TypeScript Models (Optional but Recommended)
+## Why Orval?
 
-Whenever you add or modify Document Types or Blocks in Umbraco, regenerate the frontend models:
+**Orval** transforms your Swagger/OpenAPI schema into a fully typed API client.
+**Without Orval**
+- Manual fetch calls
+- any types everywhere
+- Fragile integrations
 
-```bash
-cd frontend/umbraco-frontend
-npm run generate:umbraco-types
+**With Orval**
+- ✅ Auto-generated API functions
+- ✅ Fully typed responses
+- ✅ End-to-end type safety
+- ✅ Zero manual mapping
+- ✅ Keeps frontend in sync with CMS
+
+**Example:**
+
+```ts
+const response = await getContent20({ filter: ["contentType:article"] });
 ```
-
-This updates:
-
-```
-types/umbraco.d.ts
-```
-Providing:
-- Type safety
-- Autocomplete
-- Strong typing for API responses
+👉 Fully typed response — no guessing, no casting.
 
 ---
 
-## 5. Development Notes
-### Dynamic Pages
+## Why This Setup?
 
-The frontend uses a dynamic route:
-```
-app/[...slug]/page.tsx
-```
-This automatically fetches content from the Umbraco Delivery API based on the page URL.
-
-### Block Rendering
-Umbraco **Block List / Block Grid** components are rendered through:
-```
-lib/renderBlocks.tsx
-```
-Block types are mapped to React components in:
-```
-lib/blocksMapper.ts
-```
-Example:
-```
-HeroBlock → components/blocks/Hero.tsx
-RichTextBlock → components/blocks/RichText.tsx
-```
-
-### Block Rendering
-The global layout is defined in:
-```
-app/layout.tsx
-```
-This mirrors the structure of the Razor _Layout.cshtml used in the Starter Kit:
-- Header
-- Main content
-- Footer
-
-### Styling
-Styling can be handled in two ways:
-
-- Reuse Starter Kit CSS
-  - Copy styles from cms/wwwroot/css into frontend/styles/site.css
-
-- Tailwind CSS
-  - Configure styles in frontend/styles/tailwind.config.js if you prefer utility-first styling.
+- Type-safe from CMS → UI
+- Scalable architecture
+- Clean separation of concerns
+- CMS flexibility preserved
+- Modern frontend (Next.js App Router)
 
 ---
 
